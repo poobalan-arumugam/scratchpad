@@ -1,4 +1,7 @@
 *~
+*Debug/
+*Release/
+*.user
 
 # Compiled Object files
 *.slo

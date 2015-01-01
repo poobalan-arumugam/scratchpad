@@ -43,8 +43,6 @@ enum ABC
     H
 };
 
-class MessageBase {};
-
 class x : public MessageBase {};
 class y : public MessageBase {};
 class z : public MessageBase {};
@@ -210,9 +208,7 @@ class TestModelWithPorts :
 
 // ---------------------------------------------------------------------
 
-GTEST_TEST_SUITE( statemachine1_suite )
-
-GTEST_TEST_CASE(test_statemachine_1)
+void test1()
 {
     typedef Source1x Source1;
     MurphyPA::SM::xstatemachine_t<
@@ -232,7 +228,7 @@ GTEST_TEST_CASE(test_statemachine_1)
 }
 
 
-GTEST_TEST_CASE(test_statemachine_2)
+void test2()
 {
     MurphyPA::SM::xstatemachine_t<
             TestModel<Source1x, Source3x>,
@@ -266,7 +262,7 @@ GTEST_TEST_CASE(test_statemachine_2)
     sm2.dispatch(sm1, y());
 }
 
-GTEST_TEST_CASE(test_statemachine_3_ports)
+void test3()
 {
     MurphyPA::SM::xstatemachine_t<
             TestModelWithPorts<Source2x, Source1x, Source3x>,
@@ -297,4 +293,9 @@ GTEST_TEST_CASE(test_statemachine_3_ports)
     sm2.model().source1_port.send(y());
 }
 
-GTEST_TEST_SUITE_END()
+int main()
+{
+    test1();
+    test2();
+    test3();
+}

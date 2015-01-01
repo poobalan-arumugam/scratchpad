@@ -1,4 +1,19 @@
+#include <stdexcept>
 
+class MessageBase
+{
+public:
+    virtual ~MessageBase(){}
+
+    int _typecode() const { return 0; }
+    static int _cpp_typecode() { return 0; }
+};
+
+
+std::ostream& operator <<(std::ostream& os, const MessageBase& ev)
+{
+    return os;
+}
 
 class EventSource
 {
