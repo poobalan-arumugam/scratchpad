@@ -43,9 +43,26 @@ enum ABC
     H
 };
 
-class x : public MessageBase {};
-class y : public MessageBase {};
-class z : public MessageBase {};
+class x : public MessageBase
+{
+public:
+    int _typecode() const override { return 1; }
+    static int _cpp_typecode() { return 1; }
+};
+
+class y : public MessageBase
+{
+public:
+    int _typecode() const override { return 2; }
+    static int _cpp_typecode() { return 2; }
+};
+
+class z : public MessageBase
+{
+public:
+    int _typecode() const override { return 3; }
+    static int _cpp_typecode() { return 3; }
+};
 
 #define LOGFUNC(func) \
 void func() \

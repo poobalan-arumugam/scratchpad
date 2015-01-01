@@ -5,8 +5,8 @@ class MessageBase
 public:
     virtual ~MessageBase(){}
 
-    int _typecode() const { return 0; }
-    static int _cpp_typecode() { return 0; }
+    virtual int _typecode() const = 0;
+    //static int _cpp_typecode() { return 0; }
 };
 
 
