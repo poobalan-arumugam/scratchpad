@@ -1,0 +1,17 @@
+cpp statemachine code gen - which does function per event and then switch on state.
+
+dependencies are not included - but are from old sourceforge project http://sourceforge.net/projects/stateproto/
+
+concerns:
+
+a) generating explicit exit/entry/transition for every guard condition even if two conditions share a code path.
+b) python generator code is too complex - might have to rewrite to fit with previous fsm gen samples. Wanted to get to testing cpp code asap.
+
+notes:
+
+a) generated cpp code does not build yet.
+b) no state history support yet.
+c) used old stateproto C# gui to generate input file: test_machine1.sm1
+
+
+
