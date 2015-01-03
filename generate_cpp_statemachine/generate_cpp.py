@@ -767,7 +767,7 @@ public:
 
         baseclassname = parsed_model.header().basestatemachine
         if baseclassname is None:
-            baseclassname = "statemachine_t<EventSource, MessageBase>"
+            baseclassname = "statemachine_t<EventSource, EventBase>"
 
         namespace = parsed_model.header().namespace
         if namespace is None:
@@ -783,7 +783,7 @@ public:
 
 
         class_template = """
-template <typename UnderlyingModel, typename EventSource, typename MessageBase, 
+template <typename UnderlyingModel, typename EventSource, typename EventBase, 
           typename MY_SOURCE_REPRESENTATION, {SOURCES}>
 class {machine_name} : public {baseclassname}, public MY_SOURCE_REPRESENTATION
 {{
@@ -800,7 +800,7 @@ public:
         initialise_statemachine(*this, _model);
     }}
 
-    void dispatch(EventSource& source, const MessageBase& ev) override
+    void dispatch(EventSource& source, const EventBase& ev) override
     {{
         // slow hack -- need a dispatch method per source type
         {DISPATCH}
@@ -810,7 +810,7 @@ public:
     }}
 
     // for use as an event source
-    void send(EventSource& source, const MessageBase& ev) override 
+    void send(EventSource& source, const EventBase& ev) override 
     {{
         dispatch(source, ev);
     }}
@@ -828,7 +828,7 @@ public:
 protected:
     void _model_unhandled_event(
             const EventSource& source,
-            const MessageBase& ev)
+            const EventBase& ev)
     {{
         _model.unhandled_event(source, ev);
     }}
@@ -1053,7 +1053,7 @@ private:
         for source in sorted(sources):
             print()
             print("template <typename StateMachine, typename Underlying>")
-            print("void dispatch(StateMachine& sm, Underlying& model, const %s& source, const MessageBase& ev)" % (source,))
+            print("void dispatch(StateMachine& sm, Underlying& model, const %s& source, const EventBase& ev)" % (source,))
             print("{")
             print("%sif(!sm.is_initialised())" % (offset,))
             print("%s{" % (offset,))

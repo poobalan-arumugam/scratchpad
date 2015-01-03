@@ -144,12 +144,12 @@ public:
 };
 
 
-template <typename UnderlyingModel, typename EventSource, typename MessageBase, 
+template <typename UnderlyingModel, typename EventSource, typename EventBase, 
           typename MY_SOURCE_REPRESENTATION, typename Source1, typename Source2>
-class xstatemachine_t : public statemachine_t<EventSource, MessageBase>, public MY_SOURCE_REPRESENTATION
+class xstatemachine_t : public statemachine_t<EventSource, EventBase>, public MY_SOURCE_REPRESENTATION
 {
 public:
-    typedef statemachine_t<EventSource, MessageBase> inherited;
+    typedef statemachine_t<EventSource, EventBase> inherited;
 
 public:
     xstatemachine_t(const std::string& instanceid)
@@ -161,7 +161,7 @@ public:
         initialise_statemachine(*this, _model);
     }
 
-    void dispatch(EventSource& source, const MessageBase& ev) override
+    void dispatch(EventSource& source, const EventBase& ev) override
     {
         // slow hack -- need a dispatch method per source type
         
@@ -189,7 +189,7 @@ public:
     }
 
     // for use as an event source
-    void send(EventSource& source, const MessageBase& ev) override 
+    void send(EventSource& source, const EventBase& ev) override 
     {
         dispatch(source, ev);
     }
@@ -207,7 +207,7 @@ public:
 protected:
     void _model_unhandled_event(
             const EventSource& source,
-            const MessageBase& ev)
+            const EventBase& ev)
     {
         _model.unhandled_event(source, ev);
     }
@@ -472,7 +472,7 @@ void process_event(StateMachine& sm, Underlying& model, const Source2& source, c
 }
 
 template <typename StateMachine, typename Underlying>
-void dispatch(StateMachine& sm, Underlying& model, const Source1& source, const MessageBase& ev)
+void dispatch(StateMachine& sm, Underlying& model, const Source1& source, const EventBase& ev)
 {
     if(!sm.is_initialised())
     {
@@ -497,7 +497,7 @@ void dispatch(StateMachine& sm, Underlying& model, const Source1& source, const 
 
 
 template <typename StateMachine, typename Underlying>
-void dispatch(StateMachine& sm, Underlying& model, const Source2& source, const MessageBase& ev)
+void dispatch(StateMachine& sm, Underlying& model, const Source2& source, const EventBase& ev)
 {
     if(!sm.is_initialised())
     {
