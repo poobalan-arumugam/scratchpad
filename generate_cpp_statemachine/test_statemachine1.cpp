@@ -1,4 +1,6 @@
 #include <iostream>
+#include <vector>
+#include <sstream>
 #include "base_statemachine.h"
 
 class TEST{};
@@ -43,21 +45,21 @@ enum ABC
     H
 };
 
-class x : public MessageBase
+class x : public EventBase
 {
 public:
     int _typecode() const override { return 1; }
     static int _cpp_typecode() { return 1; }
 };
 
-class y : public MessageBase
+class y : public EventBase
 {
 public:
     int _typecode() const override { return 2; }
     static int _cpp_typecode() { return 2; }
 };
 
-class z : public MessageBase
+class z : public EventBase
 {
 public:
     int _typecode() const override { return 3; }
@@ -230,7 +232,7 @@ void test1()
     typedef Source1x Source1;
     MurphyPA::SM::xstatemachine_t<
             TestModel<Source1x, Source2x>,
-            EventSource, MessageBase,
+            EventSource, EventBase,
             Source4x, Source1x, Source2x
             > sm("x");
     sm.initialise();
@@ -249,12 +251,12 @@ void test2()
 {
     MurphyPA::SM::xstatemachine_t<
             TestModel<Source1x, Source3x>,
-            EventSource, MessageBase,
+            EventSource, EventBase,
             Source2x, Source1x, Source3x
             > sm1("x1");
     MurphyPA::SM::xstatemachine_t<
             TestModel<Source2x, Source3x>,
-            EventSource, MessageBase,
+            EventSource, EventBase,
             Source1x, Source2x, Source3x
             > sm2("x2");
 
@@ -283,12 +285,12 @@ void test3()
 {
     MurphyPA::SM::xstatemachine_t<
             TestModelWithPorts<Source2x, Source1x, Source3x>,
-            EventSource, MessageBase,
+            EventSource, EventBase,
             Source2x, Source1x, Source3x
             > sm1("x1");
     MurphyPA::SM::xstatemachine_t<
             TestModelWithPorts<Source1x, Source2x, Source3x>,
-            EventSource, MessageBase,
+            EventSource, EventBase,
             Source1x, Source2x, Source3x
             > sm2("x2");
 

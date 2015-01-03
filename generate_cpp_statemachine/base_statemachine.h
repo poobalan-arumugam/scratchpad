@@ -1,17 +1,22 @@
 #include <stdexcept>
 
-class MessageBase
+#define SM_UNUSED_ARG(arg) \
+{ (void)arg; }
+
+
+class EventBase
 {
 public:
-    virtual ~MessageBase(){}
+    virtual ~EventBase(){}
 
     virtual int _typecode() const = 0;
     //static int _cpp_typecode() { return 0; }
 };
 
 
-std::ostream& operator <<(std::ostream& os, const MessageBase& ev)
+std::ostream& operator <<(std::ostream& os, const EventBase& ev)
 {
+    os << "Event? " << ((void*)&ev);
     return os;
 }
 
@@ -20,11 +25,20 @@ class EventSource
 public:
     virtual ~EventSource(){}
 
-    virtual void send(EventSource& source, const MessageBase& ev)
+    virtual void send(EventSource& source, const EventBase& ev)
     {
+        SM_UNUSED_ARG(source);
+        SM_UNUSED_ARG(ev);
         throw std::logic_error("Must be overriden");
     }
 };
+
+
+std::ostream& operator <<(std::ostream& os, const EventSource& source)
+{
+    os << "EventSource? " << ((void*)&source);
+    return os;
+}
 
 template <typename Owner, typename Target>
 class PortBinding
@@ -47,7 +61,7 @@ public:
         _target = target;
     }
 
-    void send(const MessageBase& ev)
+    void send(const EventBase& ev)
     {
         if(nullptr == _target)
         {
@@ -65,7 +79,7 @@ private:
     Target* _target;
 };
 
-template <typename EventSource, typename MessageBase>
+template <typename EventSource, typename EventBase>
 class statemachine_t
 {
 public:
@@ -76,7 +90,7 @@ public:
     {}
 
     virtual void initialise() = 0;
-    virtual void dispatch(EventSource& source, const MessageBase& ev) = 0;
+    virtual void dispatch(EventSource& source, const EventBase& ev) = 0;
 
     virtual std::string modelname() const = 0;
     virtual std::string modelnamespace() const = 0;
@@ -94,7 +108,7 @@ public:
     inline bool is_initialised() const { return _is_initialised; }
     inline void set_initialised() { _is_initialised = true; }
 
-    virtual void unhandled_event(const EventSource& source, const MessageBase& ev)
+    virtual void unhandled_event(const EventSource& source, const EventBase& ev)
     {
         _model_unhandled_event(source, ev);
     }
@@ -102,7 +116,7 @@ public:
 protected:
     virtual void _model_unhandled_event(
             const EventSource& source,
-            const MessageBase& ev) = 0;
+            const EventBase& ev) = 0;
 
 private:
     bool _is_initialised;
