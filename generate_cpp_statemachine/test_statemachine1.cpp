@@ -66,11 +66,19 @@ public:
     static int _cpp_typecode() { return 3; }
 };
 
+#define audit(line) \
+{ \
+    std::ostringstream oss; \
+    oss << line << std::endl; \
+    _audit(oss.str()); \
+}
+
 #define LOGFUNC(func) \
 void func() \
 {  \
-    std::cout << #func << std::endl; \
+    audit(#func); \
 }
+
 
 template <typename Source1, typename Source2>
 class TestModel
@@ -83,116 +91,132 @@ public:
 
     void a_entry()
     {
-        std::cout << "void a_entry()" << std::endl;
+        audit("void a_entry()");
     }
     void a_exit()
     {
-        std::cout << "void a_exit()" << std::endl;
+        audit("void a_exit()");
     }
     void b_entry()
     {
-        std::cout << "void b_entry()" << std::endl;
+        audit("void b_entry()");
     }
     void b_exit()
     {
-        std::cout << "void b_exit()" << std::endl;
+        audit("void b_exit()");
     }
     void c_entry()
     {
-        std::cout << "void c_entry()" << std::endl;
+        audit("void c_entry()");
     }
     void c_exit()
     {
-        std::cout << "void c_exit()" << std::endl;
+        audit("void c_exit()");
     }
     void d_entry()
     {
-        std::cout << "void d_entry()" << std::endl;
+        audit("void d_entry()");
     }
     void d_exit()
     {
-        std::cout << "void d_exit()" << std::endl;
+        audit("void d_exit()");
     }
     void e_entry()
     {
-        std::cout << "void e_entry()" << std::endl;
+        audit("void e_entry()");
     }
     void e_exit()
     {
-        std::cout << "void e_exit()" << std::endl;
+        audit("void e_exit()");
     }
     void f_entry()
     {
-        std::cout << "void f_entry()" << std::endl;
+        audit("void f_entry()");
     }
     void f_exit()
     {
-        std::cout << "void f_exit()" << std::endl;
+        audit("void f_exit()");
     }
     void g_entry()
     {
-        std::cout << "void g_entry()" << std::endl;
+        audit("void g_entry()");
     }
     void g_exit()
     {
-        std::cout << "void g_exit()" << std::endl;
+        audit("void g_exit()");
     }
     void h_entry()
     {
-        std::cout << "void h_entry()" << std::endl;
+        audit("void h_entry()");
     }
     void h_exit()
     {
-        std::cout << "void h_exit()" << std::endl;
+        audit("void h_exit()");
     }
     void t_entry()
     {
-        std::cout << "void t_entry()" << std::endl;
+        audit("void t_entry()");
     }
     void t_exit()
     {
-        std::cout << "void t_exit()" << std::endl;
+        audit("void t_exit()");
     }
     bool test1(const Source1& source, const x& ev)
     {
-        std::cout << "bool test1(const Source1& source, const x& ev)" << " " << ev << std::endl;
+        audit("bool test1(const Source1& source, const x& ev)"
+              << " " << source
+              << " " << ev);
         return _test1;
     }
     bool test2(const Source1& source, const x& ev)
     {
-        std::cout << "bool test2(const Source1& source, const x& ev)" << " " << ev << std::endl;
+        audit("bool test2(const Source1& source, const x& ev)"
+              << " " << source
+              << " " << ev);
         return _test2;
     }
     void action1(const Source1& source, const x& ev)
     {
-        std::cout << "void action1(const Source1& source, const x& ev)" << " " << ev << std::endl;
+        audit("void action1(const Source1& source, const x& ev)"
+              << " " << source
+              << " " << ev);
     }
     void action2(const Source1& source, const x& ev)
     {
-        std::cout << "void action2(const Source1& source, const x& ev)" << " " << ev << std::endl;
+        audit("void action2(const Source1& source, const x& ev)"
+              << " " << source
+              << " " << ev);
     }
     void action3(const Source1& source, const y& ev)
     {
-        std::cout << "void action3(const Source1& source, const y& ev)" << " " << ev << std::endl;
+        audit("void action3(const Source1& source, const y& ev)"
+              << " " << source
+              << " " << ev);
     }
     void action4(const Source2& source, const z& ev)
     {
-        std::cout << "void action4(const Source2& source, const z& ev)" << " " << ev << std::endl;
+        audit("void action4(const Source2& source, const z& ev)"
+              << " " << source
+              << " " << ev);
     }
     void action5(const Source1& source, const x& ev)
     {
-        std::cout << "void action5(const Source1& source, const x& ev)" << " " << ev << std::endl;
+        audit("void action5(const Source1& source, const x& ev)"
+              << " " << source
+              << " " << ev);
     }
     void action6(const Source1& source, const y& ev)
     {
-        std::cout << "void action6(const Source1& source, const y& ev)" << " " << ev << std::endl;
+        audit("void action6(const Source1& source, const y& ev)"
+              << " " << source
+              << " " << ev);
     }
 
     // ----------------------
 
-    void unhandled_event(const EventSource& source, const MessageBase& ev)
+    void unhandled_event(const EventSource& source, const EventBase& ev)
     {
-        std::cout << ev << std::endl;
+        audit("unhandled event for source: " << source << " and event: " << ev);
     }
 
     void test1(bool value)
@@ -205,9 +229,21 @@ public:
         _test2 = value;
     }
 
+
+    const std::vector<std::string>& audit_trail() const
+    {
+        return _audit_trail;
+    }
+
 private:
     bool _test1;
     bool _test2;
+    std::vector<std::string> _audit_trail;
+
+    void _audit(const std::string& activity)
+    {
+        _audit_trail.push_back(activity);
+    }
 };
 
 
@@ -244,6 +280,10 @@ void test1()
     sm.model().test1(false);
     sm.dispatch(source1, x());
     sm.dispatch(source1, y());
+
+    const std::vector<std::string>& audit_trail = sm.model().audit_trail();
+
+    audit_trail.size();
 }
 
 
