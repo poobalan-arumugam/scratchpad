@@ -1,3 +1,5 @@
+#include "base_statemachine.h"
+
 // Note: very naive state machine implementation - but hopefully readable and easy enough to debug?
 
 // Source:  test_machine1.sm1

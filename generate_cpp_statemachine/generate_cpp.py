@@ -613,6 +613,9 @@ class Test1(object):
                        reader,
                        print):
 
+        print('#include "base_statemachine.h"')
+        print()
+
         print("// Note: very naive state machine implementation - but hopefully readable and easy enough to debug?")
         print()
         print("// Source: ", input_filename)

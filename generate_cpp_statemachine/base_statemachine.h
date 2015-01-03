@@ -1,3 +1,6 @@
+#ifndef __MPA__BASE_STATE_MACHINE__HPP__
+#define __MPA__BASE_STATE_MACHINE__HPP__
+
 #include <stdexcept>
 
 #define SM_UNUSED_ARG(arg) \
@@ -124,3 +127,4 @@ private:
     std::string _instanceid;
 };
 
+#endif // __MPA__BASE_STATE_MACHINE__HPP__
