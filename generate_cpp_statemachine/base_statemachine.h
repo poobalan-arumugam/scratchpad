@@ -10,29 +10,44 @@ namespace nsii {
 namespace statemachine {
 
 
-class EventBase
+///
+/// \brief The Event class
+///
+/// Event does not need to be used by an implementation.
+/// As long as the implementation provides the _typecode method.
+///
+class Event
 {
 public:
-    virtual ~EventBase(){}
+    virtual ~Event(){}
 
     virtual int _typecode() const = 0;
     //static int _cpp_typecode() { return 0; }
 };
 
 
-std::ostream& operator <<(std::ostream& os, const EventBase& ev)
+std::ostream& operator <<(std::ostream& os, const Event& ev)
 {
     os << "Event? " << ((void*)&ev);
     return os;
 }
 
-template <typename EventBase>
+///
+/// \brief The EventSource class
+///
+/// EventSource must be derived from using the CRTP pattern
+/// to declare its first template type.
+/// (http://en.wikipedia.org/wiki/Curiously_recurring_template_pattern)
+///
+/// e.g. class ABC : public nsii::statemachine::EventSource<ABC, MyEvent>{};
+///
+template <typename EventSourceBase, typename EventBase>
 class EventSource
 {
 public:
     virtual ~EventSource(){}
 
-    virtual void send(EventSource& source, const EventBase& ev)
+    virtual void send(EventSourceBase& source, const EventBase& ev)
     {
         SM_UNUSED_ARG(source);
         SM_UNUSED_ARG(ev);
@@ -40,14 +55,20 @@ public:
     }
 };
 
-
-template <typename EventBase>
-std::ostream& operator <<(std::ostream& os, const EventSource<EventBase>& source)
+template <typename EventSourceBase, typename EventBase>
+std::ostream& operator <<(std::ostream& os,
+                          const EventSource<EventSourceBase, EventBase>& source)
 {
     os << "EventSource? " << ((void*)&source);
     return os;
 }
 
+///
+/// \brief The PortBinding class
+///
+/// PortBinding acts as an event source on behalf of a
+/// real event source.
+///
 template <typename Owner, typename Target, typename EventBase>
 class PortBinding
 {
@@ -87,7 +108,18 @@ private:
     Target* _target;
 };
 
-template <typename EventSource, typename EventBase>
+///
+/// \brief The statemachine_t class
+///
+/// Note that statechine_t is fully templatized on the event source
+/// and event base types - with the event base having a requirement
+/// as in "Event" above.
+///
+/// One way of getting a derived implementation is to use the
+/// StateProto project and the generate_cpp.py scratch file.
+/// This will be improved over time.
+///
+template <typename EventSourceBase, typename EventBase>
 class statemachine_t
 {
 public:
@@ -98,7 +130,7 @@ public:
     {}
 
     virtual void initialise() = 0;
-    virtual void dispatch(EventSource& source, const EventBase& ev) = 0;
+    virtual void dispatch(EventSourceBase& source, const EventBase& ev) = 0;
 
     virtual std::string modelname() const = 0;
     virtual std::string modelnamespace() const = 0;
@@ -116,14 +148,14 @@ public:
     inline bool is_initialised() const { return _is_initialised; }
     inline void set_initialised() { _is_initialised = true; }
 
-    virtual void unhandled_event(const EventSource& source, const EventBase& ev)
+    virtual void unhandled_event(const EventSourceBase& source, const EventBase& ev)
     {
         _model_unhandled_event(source, ev);
     }
 
 protected:
     virtual void _model_unhandled_event(
-            const EventSource& source,
+            const EventSourceBase& source,
             const EventBase& ev) = 0;
 
 private:
