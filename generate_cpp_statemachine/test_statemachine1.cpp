@@ -5,27 +5,34 @@
 
 class TEST{};
 
-class UserSource : public EventSource
+class MyEvent : public nsii::statemachine::Event {};
+
+class MyEventSource : public nsii::statemachine::EventSource<MyEventSource, MyEvent>
 {
 
 };
 
-class Source1x : public EventSource
+class UserSource : public MyEventSource
 {
 
 };
 
-class Source2x : public EventSource
+class Source1x : public MyEventSource
 {
 
 };
 
-class Source3x : public EventSource
+class Source2x : public MyEventSource
 {
 
 };
 
-class Source4x : public EventSource
+class Source3x : public MyEventSource
+{
+
+};
+
+class Source4x : public MyEventSource
 {
 
 };
@@ -45,21 +52,21 @@ enum ABC
     H
 };
 
-class x : public EventBase
+class x : public MyEvent
 {
 public:
     int _typecode() const override { return 1; }
     static int _cpp_typecode() { return 1; }
 };
 
-class y : public EventBase
+class y : public MyEvent
 {
 public:
     int _typecode() const override { return 2; }
     static int _cpp_typecode() { return 2; }
 };
 
-class z : public EventBase
+class z : public MyEvent
 {
 public:
     int _typecode() const override { return 3; }
@@ -214,7 +221,7 @@ public:
 
     // ----------------------
 
-    void unhandled_event(const EventSource& source, const EventBase& ev)
+    void unhandled_event(const MyEventSource& source, const MyEvent& ev)
     {
         audit("unhandled event for source: " << source << " and event: " << ev);
     }
@@ -253,10 +260,10 @@ private:
 
 // ----------------------------------------------------------------------
 
-template <typename Owner, typename Source1, typename Source2>
+template <typename Owner, typename Source1, typename Source2, typename EventBase>
 class TestModelWithPorts :
         public TestModel<Source1, Source2>,
-        public MurphyPA::SM::xstatemachine_t_Ports<Owner, Source1, Source2>
+        public MurphyPA::SM::xstatemachine_t_Ports<Owner, Source1, Source2, EventBase>
 {
 
 };
@@ -268,7 +275,7 @@ void test1()
     typedef Source1x Source1;
     MurphyPA::SM::xstatemachine_t<
             TestModel<Source1x, Source2x>,
-            EventSource, EventBase,
+            MyEventSource, MyEvent,
             Source4x, Source1x, Source2x
             > sm("x");
     sm.initialise();
@@ -291,12 +298,12 @@ void test2()
 {
     MurphyPA::SM::xstatemachine_t<
             TestModel<Source1x, Source3x>,
-            EventSource, EventBase,
+            MyEventSource, MyEvent,
             Source2x, Source1x, Source3x
             > sm1("x1");
     MurphyPA::SM::xstatemachine_t<
             TestModel<Source2x, Source3x>,
-            EventSource, EventBase,
+            MyEventSource, MyEvent,
             Source1x, Source2x, Source3x
             > sm2("x2");
 
@@ -319,18 +326,22 @@ void test2()
     sm2.dispatch(sm1, y());
 
     sm2.dispatch(sm1, y());
+
+    const std::vector<std::string>& audit_trail = sm1.model().audit_trail();
+
+    audit_trail.size();
 }
 
 void test3()
 {
     MurphyPA::SM::xstatemachine_t<
-            TestModelWithPorts<Source2x, Source1x, Source3x>,
-            EventSource, EventBase,
+            TestModelWithPorts<Source2x, Source1x, Source3x, MyEvent>,
+            MyEventSource, MyEvent,
             Source2x, Source1x, Source3x
             > sm1("x1");
     MurphyPA::SM::xstatemachine_t<
-            TestModelWithPorts<Source1x, Source2x, Source3x>,
-            EventSource, EventBase,
+            TestModelWithPorts<Source1x, Source2x, Source3x, MyEvent>,
+            MyEventSource, MyEvent,
             Source1x, Source2x, Source3x
             > sm2("x2");
 
@@ -350,6 +361,10 @@ void test3()
     sm2.model().source1_port.send(y());
     sm2.model().source1_port.send(x());
     sm2.model().source1_port.send(y());
+
+    const std::vector<std::string>& audit_trail = sm2.model().audit_trail();
+
+    audit_trail.size();
 }
 
 int main()

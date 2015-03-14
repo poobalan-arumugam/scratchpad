@@ -24,7 +24,12 @@ namespace MurphyPA
 namespace SM
 {
 
-template <typename Owner, typename Source1, typename Source2>
+using namespace nsii::statemachine;
+
+template <typename Owner,
+          typename Source1,
+          typename Source2,
+          typename EventBase>
 class xstatemachine_t_Ports
 {
 public:
@@ -137,19 +142,21 @@ public:
     }
     */
 
-    PortBinding<Owner, Source1> source1_port;
+    PortBinding<Owner, Source1, EventBase> source1_port;
 
-    PortBinding<Owner, Source2> source2_port;
+    PortBinding<Owner, Source2, EventBase> source2_port;
 
 };
 
 
-template <typename UnderlyingModel, typename EventSource, typename EventBase, 
+template <typename UnderlyingModel, typename EventSourceBase, typename EventBase,
           typename MY_SOURCE_REPRESENTATION, typename Source1, typename Source2>
-class xstatemachine_t : public statemachine_t<EventSource, EventBase>, public MY_SOURCE_REPRESENTATION
+class xstatemachine_t :
+        public statemachine_t<EventSourceBase, EventBase>,
+        public MY_SOURCE_REPRESENTATION
 {
 public:
-    typedef statemachine_t<EventSource, EventBase> inherited;
+    typedef statemachine_t<EventSourceBase, EventBase> inherited;
 
 public:
     xstatemachine_t(const std::string& instanceid)
@@ -161,7 +168,7 @@ public:
         initialise_statemachine(*this, _model);
     }
 
-    void dispatch(EventSource& source, const EventBase& ev) override
+    void dispatch(EventSourceBase& source, const EventBase& ev) override
     {
         // slow hack -- need a dispatch method per source type
         
@@ -189,7 +196,7 @@ public:
     }
 
     // for use as an event source
-    void send(EventSource& source, const EventBase& ev) override 
+    void send(EventSourceBase& source, const EventBase& ev) override
     {
         dispatch(source, ev);
     }
@@ -206,7 +213,7 @@ public:
 
 protected:
     void _model_unhandled_event(
-            const EventSource& source,
+            const EventSourceBase& source,
             const EventBase& ev)
     {
         _model.unhandled_event(source, ev);
