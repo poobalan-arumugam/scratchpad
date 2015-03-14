@@ -23,6 +23,7 @@ std::ostream& operator <<(std::ostream& os, const EventBase& ev)
     return os;
 }
 
+template <typename EventBase>
 class EventSource
 {
 public:
@@ -37,13 +38,14 @@ public:
 };
 
 
-std::ostream& operator <<(std::ostream& os, const EventSource& source)
+template <typename EventBase>
+std::ostream& operator <<(std::ostream& os, const EventSource<EventBase>& source)
 {
     os << "EventSource? " << ((void*)&source);
     return os;
 }
 
-template <typename Owner, typename Target>
+template <typename Owner, typename Target, typename EventBase>
 class PortBinding
 {
 public:
