@@ -27,8 +27,7 @@ namespace SM
 using namespace nsii::statemachine;
 
 template <typename Owner,
-          typename Source1,
-          typename Source2,
+          typename Source1, typename Source2,
           typename EventBase>
 class xstatemachine_t_Ports
 {

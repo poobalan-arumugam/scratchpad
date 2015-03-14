@@ -744,11 +744,13 @@ class Test1(object):
         PORTS = ""
         for portname in sorted(sources):
             PORTS += """
-    PortBinding<Owner, %s> %s_port;
+    PortBinding<Owner, %s, EventBase> %s_port;
 """ % (portname, portname.lower(),)
 
         ports_class = """
-template <typename Owner, {SOURCES}>
+template <typename Owner,
+          {SOURCES},
+          typename EventBase>
 class {machine_name}_Ports
 {{
 public:
@@ -767,7 +769,7 @@ public:
 
         baseclassname = parsed_model.header().basestatemachine
         if baseclassname is None:
-            baseclassname = "statemachine_t<EventSource, EventBase>"
+            baseclassname = "statemachine_t<EventSourceBase, EventBase>"
 
         namespace = parsed_model.header().namespace
         if namespace is None:
@@ -778,14 +780,18 @@ public:
             print ("namespace", ns)
             print ("{")
 
+        print()
+        print("using namespace nsii::statemachine;")
 
         print(ports_class.format(**locals()))
 
 
         class_template = """
-template <typename UnderlyingModel, typename EventSource, typename EventBase, 
+template <typename UnderlyingModel, typename EventSourceBase, typename EventBase,
           typename MY_SOURCE_REPRESENTATION, {SOURCES}>
-class {machine_name} : public {baseclassname}, public MY_SOURCE_REPRESENTATION
+class {machine_name} :
+        public {baseclassname},
+        public MY_SOURCE_REPRESENTATION
 {{
 public:
     typedef {baseclassname} inherited;
@@ -800,7 +806,7 @@ public:
         initialise_statemachine(*this, _model);
     }}
 
-    void dispatch(EventSource& source, const EventBase& ev) override
+    void dispatch(EventSourceBase& source, const EventBase& ev) override
     {{
         // slow hack -- need a dispatch method per source type
         {DISPATCH}
@@ -810,7 +816,7 @@ public:
     }}
 
     // for use as an event source
-    void send(EventSource& source, const EventBase& ev) override 
+    void send(EventSourceBase& source, const EventBase& ev) override
     {{
         dispatch(source, ev);
     }}
@@ -827,7 +833,7 @@ public:
 
 protected:
     void _model_unhandled_event(
-            const EventSource& source,
+            const EventSourceBase& source,
             const EventBase& ev)
     {{
         _model.unhandled_event(source, ev);
