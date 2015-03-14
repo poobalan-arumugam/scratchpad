@@ -6,6 +6,9 @@
 #define SM_UNUSED_ARG(arg) \
 { (void)arg; }
 
+namespace nsii {
+namespace statemachine {
+
 
 class EventBase
 {
@@ -128,5 +131,8 @@ private:
     int _state;
     std::string _instanceid;
 };
+
+} // statemachine
+} // nsii
 
 #endif // __MPA__BASE_STATE_MACHINE__HPP__
