@@ -78,7 +78,8 @@ def get_state_name_from_guid(parsed_model, state_guid):
 
 
 def get_hops_to_parent(state, parent_state):
-    assert type(state) == type(parent_state)
+    assert type(state) == type(parent_state), (type(state),
+                                               type(parent_state))
     hop_count = 0
     while state != parent_state:
         state = state.parentNode()
@@ -910,13 +911,13 @@ private:
                     #                                        xstateguid), 
                     #      [n.state().name for n in source_states])
 
-                    for s_index, linear_state_list in zip(range(len(linear_child_state_lists)),
-                                                          linear_child_state_lists):
+                    for s_index, linear_state_list in enumerate(linear_child_state_lists):
                         state = linear_state_list[0]
                         if state not in state_transition_info:
                             state_transition_info[state] = []
 
                         # find competing transitions
+                        do_not_add_outer_transition = False
                         drop_list = []
                         for xindex, xinfo in enumerate(state_transition_info[state]):
                             xtransition = xinfo[5]
@@ -932,11 +933,19 @@ private:
                                             state, # child
                                             get_state_node_from_guid(parsed_model, transition.fromstate)) # parent
                                         if hops_to_parent_transition < hops_to_parent_xtransition:
-                                            print("// Drop transition:", xindex, xtransition.guid)
+                                            #print("// Drop transition:", xindex, xtransition.guid)
+                                            print("// Drop transition:", xtransition.guid, "in favour of", transition.guid)
                                             drop_list.append(xindex)
+                                        else:
+                                            # outer transition is further from parent state
+                                            print("// Drop transition:", transition.guid, "in favour of", xtransition.guid)
+                                            do_not_add_outer_transition = True
 
                         for drop_index in reversed(drop_list):
                             del state_transition_info[state][drop_index]
+
+                        if do_not_add_outer_transition:
+                            continue
 
                         state_transition_info[state].append((state, 
                                                              linear_state_list,

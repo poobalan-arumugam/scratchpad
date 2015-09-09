@@ -371,7 +371,7 @@ void process_event(StateMachine& sm, Underlying& model, const Source1& source, c
 {
     switch(sm.state())
     {
-// Drop transition: 0 1a6ca210-bca6-4a41-9567-f3dae0ff5037
+// Drop transition: 1a6ca210-bca6-4a41-9567-f3dae0ff5037 in favour of 296f245d-9676-4201-8764-88ff7cfd92d8
     case D: // 7915e533-f297-4ef2-84eb-4a6341ebdbb1 1
     {
         {
