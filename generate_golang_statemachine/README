@@ -1,0 +1,7 @@
+same idea as generate_cpp_statemachine 
+
+concerns:
+
+copy and paste with same "print" usage of python script. will be a problem to maintain.
+
+For now acceptable because I want to poc viability of generated code.
