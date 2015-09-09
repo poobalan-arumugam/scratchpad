@@ -888,7 +888,8 @@ private:
             for xstateguid, transition_items in fromstate_transitions.items():    
                 #print(xstateguid, get_state_name_from_guid(parsed_model, xstateguid))
                 def transition_guard_sorter(transition):
-                    return (-int(transition.evaluationorderpriority), transition.guard)
+                    return (-int(transition.evaluationorderpriority),
+                            transition.guard if transition.guard is not None else "")
                 transition_items = list(sorted(transition_items, 
                                                key=transition_guard_sorter, 
                                                reverse=True))
