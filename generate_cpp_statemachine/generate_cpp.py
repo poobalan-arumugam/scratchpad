@@ -1,6 +1,8 @@
 from __future__ import print_function
 import logging
 
+logger = logging.getLogger(__name__)
+
 def make_state_tree(states):
 
     d = {}
@@ -671,6 +673,11 @@ class Test1(object):
         sources = set()
         for eventname, ev_transition_items in sorted(event_list_transitions.items()):
             source, eventname = eventname
+            if source is None:
+                error_msg = "Provide a source for event: %s in transition: %s"
+                error_msg = error_msg % (eventname, ev_transition_items,)
+                logger.error(error_msg)
+                raise Exception(error_msg)
             sources.add(source)
 
         SOURCES = ", ".join(["typename " + source for source in sorted(sources)])
